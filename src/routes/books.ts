@@ -45,20 +45,6 @@ export async function booksRoutes(app: FastifyInstance) {
       preHandler: [checkSessionIdExists],
     },
     async (request) => {
-      const books = await knex('books')
-        .select('*')
-        .where('user_id', request.user?.id)
-        .orderBy('created_at')
-      return books
-    },
-  )
-
-  app.get(
-    '/filtro',
-    {
-      preHandler: [checkSessionIdExists],
-    },
-    async (request) => {
       const filterQuerySchema = z.object({
         genre: z.string().optional(),
         status: z.string().optional(),

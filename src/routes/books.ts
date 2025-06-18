@@ -81,4 +81,31 @@ export async function booksRoutes(app: FastifyInstance) {
       return books
     },
   )
+
+  app.delete(
+    '/:bookId',
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request, response) => {
+      const getBookParamsSchema = z.object({
+        bookId: z.string().uuid(),
+      })
+
+      const { bookId } = getBookParamsSchema.parse(request.params)
+
+      const book = await knex('books')
+        .where('user_id', request.user?.id)
+        .where({ id: bookId })
+        .first()
+
+      if (!book) {
+        return response.status(404).send({ error: 'Book Id not found' })
+      }
+
+      await knex('books').where({ id: bookId }).delete()
+
+      return response.status(204).send()
+    },
+  )
 }

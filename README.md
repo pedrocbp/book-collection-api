@@ -2,9 +2,9 @@
 
 ## Regras da aplicação
 
-- [ ] Deve ser possível criar um usuário
-- [ ] Deve ser possível autenticar o usuário
-- [ ] Deve ser possível adicionar livros à coleção com:
+- [X] Deve ser possível criar um usuário
+- [X] Deve ser possível autenticar o usuário
+- [X] Deve ser possível adicionar livros à coleção com:
   - Título
   - Autor
   - Gênero
@@ -13,8 +13,8 @@
   - Avaliação (1-5 estrelas)
   - Resenha
 - [ ] Deve ser possível editar um livro
-- [ ] Deve ser possível deletar um livro
-- [ ] Deve ser possível listar todos os livros (com filtros por status/gênero)
+- [X] Deve ser possível deletar um livro
+- [X] Deve ser possível listar todos os livros (com filtros por status/gênero)
 
 ## Métricas
 

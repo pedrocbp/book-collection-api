@@ -108,4 +108,51 @@ export async function booksRoutes(app: FastifyInstance) {
       return response.status(204).send()
     },
   )
+
+  app.put(
+    '/:bookId',
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request, response) => {
+      const getBookParamsSchema = z.object({
+        bookId: z.string().uuid(),
+      })
+
+      const { bookId } = getBookParamsSchema.parse(request.params)
+
+      const updateBookBodySchema = z.object({
+        title: z.string().optional(),
+        genre: z.string().optional(),
+        author: z.string().optional(),
+        publicationYear: z.number().optional(),
+        status: z.string().optional(),
+        rating: z.number().optional(),
+        review: z.string().optional(),
+      })
+
+      const { title, genre, author, publicationYear, status, rating, review } =
+        updateBookBodySchema.parse(request.body)
+
+      const book = await knex('books')
+        .where('user_id', request.user?.id)
+        .where({ id: bookId })
+        .first()
+
+      if (!book) {
+        return response.status(404).send({ message: 'Book ID not found.' })
+      }
+
+      await knex('books').where({ id: bookId }).update({
+        title,
+        genre,
+        author,
+        publication_year: publicationYear,
+        status,
+        rating,
+        review,
+      })
+      return response.status(204).send()
+    },
+  )
 }

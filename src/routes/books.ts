@@ -3,6 +3,7 @@ import { checkSessionIdExists } from 'middlewares/check-session-id-exists'
 import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import { knex } from '../database'
+import moment from 'moment'
 
 export async function booksRoutes(app: FastifyInstance) {
   app.post(
@@ -143,15 +144,18 @@ export async function booksRoutes(app: FastifyInstance) {
         return response.status(404).send({ message: 'Book ID not found.' })
       }
 
-      await knex('books').where({ id: bookId }).update({
-        title,
-        genre,
-        author,
-        publication_year: publicationYear,
-        status,
-        rating,
-        review,
-      })
+      await knex('books')
+        .where({ id: bookId })
+        .update({
+          title,
+          genre,
+          author,
+          publication_year: publicationYear,
+          status,
+          rating,
+          review,
+          updated_at: moment().format('YYYY-MM-DD HH:mm:ss'),
+        })
       return response.status(204).send()
     },
   )

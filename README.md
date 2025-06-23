@@ -12,7 +12,7 @@
   - Status (lido, lendo, quero ler)
   - Avaliação (1-5 estrelas)
   - Resenha
-- [ ] Deve ser possível editar um livro
+- [X] Deve ser possível editar um livro
 - [X] Deve ser possível deletar um livro
 - [X] Deve ser possível listar todos os livros (com filtros por status/gênero)
 

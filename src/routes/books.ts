@@ -18,8 +18,8 @@ export async function booksRoutes(app: FastifyInstance) {
         author: z.string(),
         publicationYear: z.number(),
         status: z.string(),
-        rating: z.number(),
-        review: z.string(),
+        rating: z.number().optional(),
+        review: z.string().optional(),
       })
 
       const { title, genre, author, publicationYear, status, rating, review } =
@@ -80,6 +80,45 @@ export async function booksRoutes(app: FastifyInstance) {
       const books = await booksQuery.orderBy('created_at')
 
       return books
+    },
+  )
+
+  app.get(
+    '/metrics',
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request) => {
+      const books = await knex('books')
+        .where('user_id', request.user?.id)
+        .select([
+          knex.raw('COUNT(*) as totalBooks'),
+          knex.raw("COUNT(CASE WHEN status = 'lido' THEN 1 END) as totalRead"),
+          knex.raw(
+            "COUNT(CASE WHEN status = 'quero_ler' THEN 1 END) as totalWantToRead",
+          ),
+          knex.raw(
+            "COUNT(CASE WHEN status = 'lendo' THEN 1 END) as totalReading",
+          ),
+        ])
+        .first()
+
+      const genreDistribution = await knex('books')
+        .where('user_id', request.user?.id)
+        .select('genre')
+        .groupBy('genre')
+        .count('* as count')
+
+      const averageRating = await knex('books')
+        .where('user_id', request.user?.id)
+        .where('status = lido')
+        .avg('rating as averageRating')
+
+      return {
+        books,
+        genreDistribution,
+        averageRating,
+      }
     },
   )
 

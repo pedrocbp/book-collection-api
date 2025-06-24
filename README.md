@@ -18,7 +18,7 @@
 
 ## Métricas
 
-- [ ] Total de livros na coleção
-- [ ] Livros lidos vs não lidos
-- [ ] Distribuição por gênero
-- [ ] Média de avaliações
+- [X] Total de livros na coleção
+- [X] Livros lidos vs não lidos
+- [X] Distribuição por gênero
+- [X] Média de avaliações

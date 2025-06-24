@@ -20,8 +20,8 @@ declare module 'knex/types/tables' {
       author: string
       publication_year: number
       status: string
-      rating: number
-      review: string
+      rating?: number
+      review?: string
       created_at: string
       updated_at: string
     }

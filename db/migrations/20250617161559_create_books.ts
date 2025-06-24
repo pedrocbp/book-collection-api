@@ -13,7 +13,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string('genre').notNullable()
     table.string('author').notNullable()
     table.integer('publication_year').notNullable()
-    table.enum('status', ['lido', 'lendo', 'quero_ler']).notNullable()
+    table.enum('status', ['read', 'reading', 'want_to_read']).notNullable()
     table.integer('rating').unsigned().checkBetween([1, 5])
     table.string('review')
 

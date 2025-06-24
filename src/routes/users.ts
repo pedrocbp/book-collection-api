@@ -30,7 +30,9 @@ export async function usersRoutes(app: FastifyInstance) {
       email,
       session_id: sessionId,
     })
-    return response.status(201).send()
+    return response
+      .status(201)
+      .send({ message: `Welcome to your book collection, ${name}!` })
   })
   app.get(
     '/',

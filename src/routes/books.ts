@@ -36,7 +36,9 @@ export async function booksRoutes(app: FastifyInstance) {
         rating,
         review,
       })
-      return response.status(201).send()
+      return response
+        .status(200)
+        .send({ message: `The ${title} book added to collection` })
     },
   )
 
@@ -45,7 +47,7 @@ export async function booksRoutes(app: FastifyInstance) {
     {
       preHandler: [checkSessionIdExists],
     },
-    async (request) => {
+    async (request, response) => {
       const filterQuerySchema = z.object({
         genre: z.string().optional(),
         status: z.string().optional(),
@@ -79,7 +81,7 @@ export async function booksRoutes(app: FastifyInstance) {
 
       const books = await booksQuery.orderBy('created_at')
 
-      return books
+      return response.status(200).send({ books })
     },
   )
 
@@ -88,17 +90,17 @@ export async function booksRoutes(app: FastifyInstance) {
     {
       preHandler: [checkSessionIdExists],
     },
-    async (request) => {
+    async (request, response) => {
       const books = await knex('books')
         .where('user_id', request.user?.id)
         .select([
           knex.raw('COUNT(*) as totalBooks'),
-          knex.raw("COUNT(CASE WHEN status = 'lido' THEN 1 END) as totalRead"),
+          knex.raw("COUNT(CASE WHEN status = 'read' THEN 1 END) as totalRead"),
           knex.raw(
-            "COUNT(CASE WHEN status = 'quero_ler' THEN 1 END) as totalWantToRead",
+            "COUNT(CASE WHEN status = 'want_to_read' THEN 1 END) as totalWantToRead",
           ),
           knex.raw(
-            "COUNT(CASE WHEN status = 'lendo' THEN 1 END) as totalReading",
+            "COUNT(CASE WHEN status = 'reading' THEN 1 END) as totalReading",
           ),
         ])
         .first()
@@ -108,17 +110,18 @@ export async function booksRoutes(app: FastifyInstance) {
         .select('genre')
         .groupBy('genre')
         .count('* as count')
+        .orderBy('count', 'desc')
 
       const averageRating = await knex('books')
         .where('user_id', request.user?.id)
-        .where('status = lido')
-        .avg('rating as averageRating')
+        .where('status', 'read')
+        .select(knex.raw('ROUND(AVG(rating), 2) as averageRating'))
 
-      return {
+      return response.status(200).send({
         books,
         genreDistribution,
         averageRating,
-      }
+      })
     },
   )
 
@@ -140,12 +143,16 @@ export async function booksRoutes(app: FastifyInstance) {
         .first()
 
       if (!book) {
-        return response.status(404).send({ error: 'Book Id not found' })
+        return response
+          .status(404)
+          .send({ error: 'Book not found for the given ID' })
       }
 
       await knex('books').where({ id: bookId }).delete()
 
-      return response.status(204).send()
+      return response
+        .status(200)
+        .send({ message: 'Book deleted successfully!' })
     },
   )
 
@@ -180,7 +187,9 @@ export async function booksRoutes(app: FastifyInstance) {
         .first()
 
       if (!book) {
-        return response.status(404).send({ message: 'Book ID not found.' })
+        return response
+          .status(404)
+          .send({ message: 'Book not found for the given ID.' })
       }
 
       await knex('books')
@@ -195,7 +204,9 @@ export async function booksRoutes(app: FastifyInstance) {
           review,
           updated_at: moment().format('YYYY-MM-DD HH:mm:ss'),
         })
-      return response.status(204).send()
+      return response
+        .status(200)
+        .send({ message: `Book ${title} updated successfully` })
     },
   )
 }
